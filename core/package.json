@@ -1,0 +1,79 @@
+{
+  "name": "bedfinder-core-api",
+  "version": "1.0.0",
+  "description": "Core API for bedfinder infrastructure",
+  "main": "./dist/index.js",
+  "scripts": {
+    "start": "node --inspect=5858 -r ts-node/register ./src/index.ts",
+    "start:watch": "nodemon",
+    "build": "tsc -p .",
+    "test": "jest --forceExit",
+    "lint": "eslint . --ext .ts,.js --fix",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
+  },
+  "author": "Ole Zierau",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-typescript": "^7.9.0",
+    "@google-cloud/storage": "^4.7.0",
+    "@hapi/boom": "^9.1.0",
+    "@shelf/jest-mongodb": "^1.1.5",
+    "@types/jest": "^25.1.4",
+    "babel-jest": "^25.2.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "eslint-config-prettier": "^6.10.1",
+    "express": "^4.17.1",
+    "express-winston": "^4.0.3",
+    "firebase-admin": "^8.10.0",
+    "helmet": "^3.22.0",
+    "http-status-codes": "^1.4.0",
+    "jest": "^25.2.3",
+    "nodemon": "^2.0.2",
+    "supertest": "^4.0.2",
+    "ts-node": "^8.8.1",
+    "typescript": "^3.8.3",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.3",
+    "@types/hapi__boom": "^9.0.1",
+    "@types/helmet": "0.0.45",
+    "@types/node": "^10.0.3",
+    "@types/supertest": "^2.0.8",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
+    "eslint": "^6.8.0",
+    "eslint-config-google": "^0.14.0",
+    "gts": "^1.1.2",
+    "husky": "^4.2.3",
+    "neat-csv": "^5.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run fix && npm run check"
+    }
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "src"
+    ],
+    "exec": "npm start",
+    "ext": "ts"
+  }
+}
