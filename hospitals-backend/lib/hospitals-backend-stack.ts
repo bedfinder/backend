@@ -12,30 +12,14 @@ export class HospitalsBackendStack extends cdk.Stack {
     const hello = new Function(this, 'HelloHandler', {
       runtime: Runtime.NODEJS_12_X,    
       code: Code.fromAsset('functions'),  
-      handler: 'hello.handler'                
+      handler: 'lambda.handler'                
     });
   
     const api = new LambdaRestApi(this, 'Endpoint', {
       handler: hello,
       restApiName: "Hello-World",
     });
-    /*
-    const cognitoAuthorizer = new CfnAuthorizer(this, id, {
-      name: "CognitoAuthorizer",
-      type: AuthorizationType.COGNITO,
 
-      identitySource: "method.request.header.Authorization",
-      restApiId: api.restApiId,
-      providerArns: [this.createCognitoUserPool().userPoolArn]
-    });
-    */
-    /*
-    const items = api.root.addResource('items');
-    items.addMethod('GET', new LambdaIntegration(hello) , { 
-        authorizationType: AuthorizationType.COGNITO,
-        authorizer: {authorizerId: cognitoAuthorizer.ref},    
-    } );  // GET /items
-    */
   }
 
   createCognitoUserPool():UserPool{
