@@ -1,0 +1,6 @@
+{
+  "app": "npx ts-node bin/hospitals-backend.ts",
+  "plugin": [
+    "cdk-multi-profile-plugin"
+  ]
+}
