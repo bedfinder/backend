@@ -10,21 +10,6 @@ env:
   CORE_PATH: core
   CDK_PATH: hospitals-backend
 jobs:
-  build_cdk:
-    name: build - cdk
-    runs-on: ubuntu-18.04
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: "13.12"
-      - name: install
-        working-directory: ${{env.CDK_PATH}}
-        run: npm i
-      - name: build
-        working-directory: ${{env.CDK_PATH}}
-        run: npm run build
   build_and_test_core:
     name: build - core
     runs-on: ubuntu-18.04
@@ -46,9 +31,20 @@ jobs:
 
   deploy:
     name: deploy
-    needs: [build_cdk, build_and_test_core]
+    needs: [build_and_test_core]
     runs-on: ubuntu-18.04
     steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "13.12"
+      - name: install
+        working-directory: ${{env.CDK_PATH}}
+        run: npm i
+      - name: build
+        working-directory: ${{env.CDK_PATH}}
+        run: npm run build
       - uses: youyo/aws-cdk-github-actions@master
         with:
           cdk_subcommand: deploy
