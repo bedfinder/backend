@@ -2,10 +2,9 @@ name: aws core api deployment
 on:
   push:
     branches:
-      - develop*
-      - feature/hospital-backend
-    # paths:
-    #   - core/**
+      - develop
+    paths:
+      - core/**
 env:
   CORE_PATH: core
   CDK_PATH: hospitals-backend
@@ -25,6 +24,9 @@ jobs:
       - name: build
         working-directory: ${{env.CORE_PATH}}
         run: npm run build
+      - name: lint
+        run: npm run lint
+        working-directory: ${{env.CORE_PATH}}
       - name: test
         working-directory: ${{env.CORE_PATH}}
         run: npm run test
