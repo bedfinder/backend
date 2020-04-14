@@ -22,10 +22,10 @@ jobs:
         with:
           node-version: "13.12"
       - name: install
-        working-directory: $CDK_PATH
+        working-directory: ${{env.CDK_PATH}}
         run: npm i
       - name: build
-        working-directory: $CDK_PATH
+        working-directory: ${{env.CDK_PATH}}
         run: npm run build
   build_core:
     name: build - core
@@ -39,10 +39,10 @@ jobs:
         with:
           node-version: "13.10.1"
       - name: install
-        working-directory: $BASE_PATH
+        working-directory: ${{env.BASE_PATH}}
         run: npm i
       - name: build
-        working-directory: $BASE_PATH
+        working-directory: ${{env.BASE_PATH}}
         run: npm run build
 
   test:
@@ -52,7 +52,7 @@ jobs:
     steps:
       - name: test
         run: npm run test
-        working-directory: $BASE_PATH
+        working-directory: ${{env.BASE_PATH}}
 
   deploy:
     name: deploy
@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: scottbrenner/aws-cdk-action@master
         with:
-          args: deploy --app $CDK_PATH/
+          args: deploy --app ${{env.CDK_PATH}}/
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY }}
           AWS_ACCESS_KEY_SECRET: ${{ secrets.TEST_AWS_ACCESS_SECRET }}
