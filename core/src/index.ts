@@ -9,6 +9,7 @@ import { log } from './utils/logging';
 import { router } from './router';
 import { errorHandler } from './utils/errorHandling';
 import { respond } from './utils/response';
+import { createDatabaseConnection } from './utils/db';
 
 const _app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,8 +25,11 @@ _app.all('*', ({ res }) => respond(res!, {}, 404));
 
 /** Error Handling */
 _app.use(errorHandler);
-_app.listen(PORT, () => {
-  log.info(`🚀 Running on ${PORT}. Heavy shit.`);
+
+createDatabaseConnection.then(() => {
+  _app.listen(PORT, () => {
+    log.info(`🚀 Running on ${PORT}. Heavy shit.`);
+  });
 });
 
 // Only for test purposes
