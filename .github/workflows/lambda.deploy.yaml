@@ -1,0 +1,67 @@
+name: aws core api deployment
+on:
+  push:
+    branches:
+      - develop*
+      - feature/hospital-backend
+    # paths:
+    #   - core/**
+env:
+  BASE_PATH: core
+  CDK_PATH: hospitals-backend
+jobs:
+  build_cdk:
+    name: build - cdk
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+
+        with:
+          node-version: "13.12"
+      - name: install
+        working-directory: $CDK_PATH
+        run: npm i
+      - name: build
+        working-directory: $CDK_PATH
+        run: npm run build
+  build_core:
+    name: build - core
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+
+        with:
+          node-version: "13.10.1"
+      - name: install
+        working-directory: $BASE_PATH
+        run: npm i
+      - name: build
+        working-directory: $BASE_PATH
+        run: npm run build
+
+  test:
+    name: testing core
+    runs-on: ubuntu-18.04
+    needs: [build-core]
+    steps:
+      - name: test
+        run: npm run test
+        working-directory: $BASE_PATH
+
+  deploy:
+    name: deploy
+    needs: [test, build_cdk]
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: scottbrenner/aws-cdk-action@master
+        with:
+          args: deploy --app $CDK_PATH/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY }}
+          AWS_ACCESS_KEY_SECRET: ${{ secrets.TEST_AWS_ACCESS_SECRET }}
