@@ -53,7 +53,7 @@ jobs:
         with:
           cdk_subcommand: deploy
           actions_comment: false
-          working-directory: ${{env.CDK_PATH}}
+          working_dir: ${{env.CDK_PATH}}
           args: --require-approval never
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY }}
