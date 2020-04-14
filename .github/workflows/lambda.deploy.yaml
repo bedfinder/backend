@@ -51,10 +51,10 @@ jobs:
     steps:
       - uses: youyo/aws-cdk-github-actions@master
         with:
-          cdk_subcommand: 'deploy'
-          cdk_stack: ${{env.CDK_PATH}}
+          cdk_subcommand: deploy
           actions_comment: false
-          args: '--require-approval never'
+          working-directory: ${{env.CDK_PATH}}
+          args: --require-approval never
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY }}
           AWS_ACCESS_KEY_SECRET: ${{ secrets.TEST_AWS_ACCESS_SECRET }}
