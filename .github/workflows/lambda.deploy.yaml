@@ -48,7 +48,7 @@ jobs:
   test:
     name: testing core
     runs-on: ubuntu-18.04
-    needs: [build-core]
+    needs: [build_core]
     steps:
       - name: test
         run: npm run test
