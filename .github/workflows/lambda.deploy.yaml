@@ -46,7 +46,7 @@ jobs:
 
   deploy:
     name: deploy
-    needs: [test, build_cdk]
+    needs: [build_cdk, build_and_test_core]
     runs-on: ubuntu-18.04
     steps:
       - uses: scottbrenner/aws-cdk-action@master
