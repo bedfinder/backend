@@ -1,0 +1,58 @@
+name: aws core api deployment
+on:
+  push:
+    branches:
+      - develop*
+      - feature/hospital-backend
+    # paths:
+    #   - core/**
+env:
+  CORE_PATH: core
+  CDK_PATH: hospitals-backend
+jobs:
+  build_and_test_core:
+    name: build - core
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "13.10.1"
+      - name: install
+        working-directory: ${{env.CORE_PATH}}
+        run: npm i
+      - name: build
+        working-directory: ${{env.CORE_PATH}}
+        run: npm run build
+      - name: test
+        working-directory: ${{env.CORE_PATH}}
+        run: npm run test
+
+  deploy:
+    name: deploy
+    needs: [build_and_test_core]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "13.12"
+      - name: install
+        working-directory: ${{env.CDK_PATH}}
+        run: npm i
+      - name: build
+        working-directory: ${{env.CDK_PATH}}
+        run: npm run build
+      - uses: youyo/aws-cdk-github-actions@master
+        with:
+          cdk_subcommand: deploy
+          actions_comment: false
+          working_dir: ${{env.CDK_PATH}}
+          args: --require-approval never
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_ACCESS_SECRET }}
+          AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
+          MASTER_USER_PASSWORD: ${{secrets.DOCDB_MASTER_USER_PASSWORD}}

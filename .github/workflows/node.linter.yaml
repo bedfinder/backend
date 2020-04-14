@@ -3,6 +3,8 @@ on:
   push: 
     paths: 
     - core/**/*.ts
+env:
+  CORE_PATH: core
 jobs: 
   lint: 
     name: lint stages
@@ -15,3 +17,4 @@ jobs:
           node-version: "13.10.1"
       - name: lint
         run: npm run lint
+        working-directory: ${{env.CORE_PATH}}
