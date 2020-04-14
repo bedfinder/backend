@@ -11,3 +11,4 @@ const environments = {
 
 const app = new cdk.App();
 new HospitalsBackendStack(app, `${BedfinderStages.test}-HospitalsBackend-Stack`, {stage: BedfinderStages.test, context: "HospitalsBackend",env: environments.test});
+new HospitalsBackendStack(app, `${BedfinderStages.prod}-HospitalsBackend-Stack`, {stage: BedfinderStages.prod, context: "HospitalsBackend",env: environments.prod});

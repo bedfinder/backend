@@ -4,20 +4,35 @@ import { LambdaRestApi } from '@aws-cdk/aws-apigateway';
 import { UserPool  } from '@aws-cdk/aws-cognito';
 import { HospitalsBackendStackProbs } from '../lib/bedfinder-props'
 import { Construct, Tag } from '@aws-cdk/core';
-import { CfnDBCluster,CfnDBInstance } from '@aws-cdk/aws-docdb'
+import { CfnDBCluster,CfnDBInstance, CfnDBSubnetGroup } from '@aws-cdk/aws-docdb'
+import { Vpc,IVpc,SubnetType, BastionHostLinux, SecurityGroup} from '@aws-cdk/aws-ec2'
 
+//todo read from other stack
+const bedfinderVpcIds = {
+  "Test": "vpc-079c41f4f50f61440",
+  "Prod": ""
+}
 
 export class HospitalsBackendStack extends cdk.Stack {
   
-  props?:HospitalsBackendStackProbs
-  
-  constructor(scope: cdk.Construct, id: string, props?: HospitalsBackendStackProbs) {
+  props:HospitalsBackendStackProbs
+  bedfinderVpc:IVpc
+
+
+  constructor(scope: cdk.Construct, id: string, props: HospitalsBackendStackProbs) {
     super(scope, id, props);
 
 
     this.props = props;
+    this.bedfinderVpc = this.getBedfinderVPC()
     this.createCognitoUserPool()
     this.createDocumentDB()
+
+    new BastionHostLinux(this, `${props.stage}-BastionHost`, {
+      vpc: this.bedfinderVpc,
+      subnetSelection: { subnetType: SubnetType.PRIVATE }
+    });
+
 
 
     const hospitalsbackendFunktion = new Function(this, `${props?.stage}-${props?.context}-handlerfunction`, {
@@ -34,6 +49,17 @@ export class HospitalsBackendStack extends cdk.Stack {
 
     this.addDefaultTags(api)
 
+  }
+
+  getBedfinderVPC():IVpc{
+    const VpcName = `${this.props.stage}-BedfinderNetwork-Stack/${this.props.stage}-BedfinderNetwork-VPC` 
+    const stackName = `${this.props.stage}-BedfinderNetwork-Stack`
+    
+    const externalVpc = Vpc.fromLookup(this, `${this.props.stage}-BedfinderVPC`, {
+      vpcName: VpcName,
+      tags: {"aws:cloudformation:stack-name":stackName}
+    });
+    return externalVpc
   }
 
   createCognitoUserPool():UserPool{
@@ -53,15 +79,38 @@ export class HospitalsBackendStack extends cdk.Stack {
   }
   
   createDocumentDB(){
+        
+    let subnetIds: string[] = [];
+    
+    for(var subnet of this.bedfinderVpc.privateSubnets){
+      subnetIds.push(subnet.subnetId)
+    }
+
+    const securityGroup = new SecurityGroup(this, `${this.props.stage}-DocDbSecurityGroup`, {
+      vpc: this.bedfinderVpc,
+      securityGroupName: `${this.props.stage}-DocDbSecurityGroup`
+  });
+
+    const subnetGroup = new CfnDBSubnetGroup(this,`${this.props.stage}-DocDbSubentgroup`,{
+      subnetIds: subnetIds,
+      dbSubnetGroupDescription: "Private Bedfinder Subnet",
+      dbSubnetGroupName: `${this.props.stage}-DocDbSubentgroup`
+      
+    })
+
     const dbCluster = new CfnDBCluster(this, `${this.props?.stage}-${this.props?.context}-docdb`, {
       storageEncrypted: true,
-      //availabilityZones: vpc.availabilityZones.splice(3),
+      availabilityZones: this.bedfinderVpc.availabilityZones.splice(2),
+      
       dbClusterIdentifier: `${this.props?.stage}-${this.props?.context}-docdb`,
       masterUsername: "dbuser",
       masterUserPassword: process.env.MASTER_USER_PASSWORD as string,
-      //vpcSecurityGroupIds: [sg.securityGroupName],
-      //dbSubnetGroupName: subnetGroup.dbSubnetGroupName,
+      vpcSecurityGroupIds: [securityGroup.securityGroupName],
+      dbSubnetGroupName: subnetGroup.dbSubnetGroupName
+      
     });
+
+    dbCluster.addDependsOn(subnetGroup)
 
     const dbInstance = new CfnDBInstance(this, `${this.props?.stage}-${this.props?.context}-docdb-instance`, {
       dbClusterIdentifier: dbCluster.ref,

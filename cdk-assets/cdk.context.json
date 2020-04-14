@@ -1,0 +1,121 @@
+{
+  "@aws-cdk/core:enableStackNameDuplicates": "true",
+  "aws-cdk:enableDiffNoFail": "true",
+  "vpc-provider:account=643555865554:filter.tag:Name=Test-BedfinderNetwork-Stack/Test-BedfinderNetwork-VPC:region=eu-central-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-0e0445f07c0f66a37",
+    "vpcCidrBlock": "10.0.0.0/16",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Test-BedfinderNetwork-PublicSubnet",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-0a5b9e951748439d3",
+            "cidr": "10.0.0.64/26",
+            "availabilityZone": "eu-central-1a",
+            "routeTableId": "rtb-0f5ba98658e2572db"
+          }
+        ]
+      },
+      {
+        "name": "Test-BedfinderNetwork-PrivateSubnet",
+        "type": "Private",
+        "subnets": [
+          {
+            "subnetId": "subnet-069eabb75f0277fbf",
+            "cidr": "10.0.0.0/26",
+            "availabilityZone": "eu-central-1a",
+            "routeTableId": "rtb-010b2d16d7c6dc191"
+          }
+        ]
+      }
+    ]
+  },
+  "vpc-provider:account=643555865554:filter.tag:Name=Test-BedfinderNetwork-Stack/Test-BedfinderNetwork-VPC:filter.vpc-id=vpc-079c41f4f50f61440:region=eu-central-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-079c41f4f50f61440",
+    "vpcCidrBlock": "10.0.0.0/16",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Test-BedfinderNetwork-PublicSubnet",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-0beea8b42d3222098",
+            "cidr": "10.0.0.128/26",
+            "availabilityZone": "eu-central-1a",
+            "routeTableId": "rtb-0a70d3edac52ec238"
+          },
+          {
+            "subnetId": "subnet-0603e8ebb302a8f1c",
+            "cidr": "10.0.0.192/26",
+            "availabilityZone": "eu-central-1b",
+            "routeTableId": "rtb-055e70b164ecbea17"
+          }
+        ]
+      },
+      {
+        "name": "Test-BedfinderNetwork-PrivateSubnet",
+        "type": "Private",
+        "subnets": [
+          {
+            "subnetId": "subnet-0a0fc0a07a4b8feb0",
+            "cidr": "10.0.0.0/26",
+            "availabilityZone": "eu-central-1a",
+            "routeTableId": "rtb-09f265eca282a22fc"
+          },
+          {
+            "subnetId": "subnet-0cf6aa85d0eddccf9",
+            "cidr": "10.0.0.64/26",
+            "availabilityZone": "eu-central-1b",
+            "routeTableId": "rtb-004f8026b20724076"
+          }
+        ]
+      }
+    ]
+  },
+  "vpc-provider:account=643555865554:filter.tag:Name=Test-BedfinderNetwork-Stack/Test-BedfinderNetwork-VPC:filter.tag:aws:cloudformation:stack-name=Test-BedfinderNetwork-Stack:region=eu-central-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-079c41f4f50f61440",
+    "vpcCidrBlock": "10.0.0.0/16",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Test-BedfinderNetwork-PublicSubnet",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-0beea8b42d3222098",
+            "cidr": "10.0.0.128/26",
+            "availabilityZone": "eu-central-1a",
+            "routeTableId": "rtb-0a70d3edac52ec238"
+          },
+          {
+            "subnetId": "subnet-0603e8ebb302a8f1c",
+            "cidr": "10.0.0.192/26",
+            "availabilityZone": "eu-central-1b",
+            "routeTableId": "rtb-055e70b164ecbea17"
+          }
+        ]
+      },
+      {
+        "name": "Test-BedfinderNetwork-PrivateSubnet",
+        "type": "Private",
+        "subnets": [
+          {
+            "subnetId": "subnet-0a0fc0a07a4b8feb0",
+            "cidr": "10.0.0.0/26",
+            "availabilityZone": "eu-central-1a",
+            "routeTableId": "rtb-09f265eca282a22fc"
+          },
+          {
+            "subnetId": "subnet-0cf6aa85d0eddccf9",
+            "cidr": "10.0.0.64/26",
+            "availabilityZone": "eu-central-1b",
+            "routeTableId": "rtb-004f8026b20724076"
+          }
+        ]
+      }
+    ]
+  }
+}

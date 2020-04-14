@@ -1,3 +1,4 @@
+/*
 import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
 import HospitalsBackend = require('../lib/hospitals-backend-stack');
@@ -11,3 +12,4 @@ test('Empty Stack', () => {
       "Resources": {}
     }, MatchStyle.EXACT))
 });
+*/
