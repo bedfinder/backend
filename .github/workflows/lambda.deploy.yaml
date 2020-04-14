@@ -7,7 +7,7 @@ on:
     # paths:
     #   - core/**
 env:
-  BASE_PATH: core
+  CORE_PATH: core
   CDK_PATH: hospitals-backend
 jobs:
   build_cdk:
@@ -35,13 +35,13 @@ jobs:
         with:
           node-version: "13.10.1"
       - name: install
-        working-directory: ${{env.BASE_PATH}}
+        working-directory: ${{env.CORE_PATH}}
         run: npm i
       - name: build
-        working-directory: ${{env.BASE_PATH}}
+        working-directory: ${{env.CORE_PATH}}
         run: npm run build
       - name: test
-        working-directory: ${{env.BASE_PATH}}
+        working-directory: ${{env.CORE_PATH}}
         run: npm run test
 
   deploy:
@@ -49,9 +49,13 @@ jobs:
     needs: [build_cdk, build_and_test_core]
     runs-on: ubuntu-18.04
     steps:
-      - uses: scottbrenner/aws-cdk-action@master
+      - uses: youyo/aws-cdk-github-actions@master
         with:
-          args: deploy --app ${{env.CDK_PATH}}/
+          cdk_subcommand: 'deploy'
+          cdk_stack: ${{env.CDK_PATH}}
+          actions_comment: false
+          args: '--require-approval never'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY }}
           AWS_ACCESS_KEY_SECRET: ${{ secrets.TEST_AWS_ACCESS_SECRET }}
+          AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
