@@ -5,7 +5,7 @@ import { UserPool  } from '@aws-cdk/aws-cognito';
 import { HospitalsBackendStackProbs } from '../lib/bedfinder-props'
 import { Construct, Tag } from '@aws-cdk/core';
 import { CfnDBCluster,CfnDBInstance, CfnDBSubnetGroup } from '@aws-cdk/aws-docdb'
-import { Vpc,IVpc,SubnetType, BastionHostLinux, SecurityGroup} from '@aws-cdk/aws-ec2'
+import { Vpc,IVpc,SubnetType, BastionHostLinux, SecurityGroup, Port} from '@aws-cdk/aws-ec2'
 
 //todo read from other stack
 const bedfinderVpcIds = {
@@ -22,26 +22,45 @@ export class HospitalsBackendStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: HospitalsBackendStackProbs) {
     super(scope, id, props);
 
-
+    const docDbPort = 27017
     this.props = props;
     this.bedfinderVpc = this.getBedfinderVPC()
     this.createCognitoUserPool()
-    this.createDocumentDB()
+    
+    const docDBsecurityGroup = new SecurityGroup(this, `${this.props.stage}-DocDbSecurityGroup`, {
+      vpc: this.bedfinderVpc,
+      securityGroupName: `${this.props.stage}-DocDbSecurityGroup`
+    });
+    
+    const lambdasecurityGroup = new SecurityGroup(this, `${this.props.stage}-LambdaSecurityGroup`, {
+      vpc: this.bedfinderVpc,
+      securityGroupName: `${this.props.stage}-LambdaSecurityGroup`
+    });
+
+    const documentDb = this.createDocumentDB(docDbPort,docDBsecurityGroup)
 
     new BastionHostLinux(this, `${props.stage}-BastionHost`, {
       vpc: this.bedfinderVpc,
       subnetSelection: { subnetType: SubnetType.PRIVATE }
     });
 
-
-
     const hospitalsbackendFunktion = new Function(this, `${props?.stage}-${props?.context}-handlerfunction`, {
       runtime: Runtime.NODEJS_12_X,    
       code: Code.fromAsset('functions'),  
-      handler: 'lambda.handler'                
+      handler: 'lambda.handler',
+      vpc: this.bedfinderVpc,
+      vpcSubnets: { subnetType: SubnetType.PRIVATE },
+      securityGroup: lambdasecurityGroup,
+      environment: {  
+        "MONGODB_URI": documentDb.attrEndpoint,
+        "MONGODB_PORT" : documentDb.attrPort 
+      }              
     });
+
     this.addDefaultTags(hospitalsbackendFunktion)
-  
+    
+    docDBsecurityGroup.addIngressRule(lambdasecurityGroup,Port.tcp(docDbPort),"Allow Backend Lambda")
+
     const api = new LambdaRestApi(this, `${props?.stage}-${props?.context}-api-gateway`, {
       handler: hospitalsbackendFunktion,
       restApiName: "BackendProxy",
@@ -78,23 +97,18 @@ export class HospitalsBackendStack extends cdk.Stack {
     return userPool
   }
   
-  createDocumentDB(){
+  createDocumentDB(docDbPort:number, securityGroup:SecurityGroup):CfnDBCluster{
         
     let subnetIds: string[] = [];
     
     for(var subnet of this.bedfinderVpc.privateSubnets){
       subnetIds.push(subnet.subnetId)
-    }
+    }  
 
-    const securityGroup = new SecurityGroup(this, `${this.props.stage}-DocDbSecurityGroup`, {
-      vpc: this.bedfinderVpc,
-      securityGroupName: `${this.props.stage}-DocDbSecurityGroup`
-  });
-
-    const subnetGroup = new CfnDBSubnetGroup(this,`${this.props.stage}-DocDbSubentgroup`,{
+    const subnetGroup = new CfnDBSubnetGroup(this,`${this.props.stage}-DocDbSubnetgroup`,{
       subnetIds: subnetIds,
       dbSubnetGroupDescription: "Private Bedfinder Subnet",
-      dbSubnetGroupName: `${this.props.stage}-DocDbSubentgroup`
+      dbSubnetGroupName: `${this.props.stage}-DocDbSubnetgroup`
       
     })
 
@@ -106,7 +120,8 @@ export class HospitalsBackendStack extends cdk.Stack {
       masterUsername: "dbuser",
       masterUserPassword: process.env.MASTER_USER_PASSWORD as string,
       vpcSecurityGroupIds: [securityGroup.securityGroupName],
-      dbSubnetGroupName: subnetGroup.dbSubnetGroupName
+      dbSubnetGroupName: subnetGroup.dbSubnetGroupName?.toLowerCase(),
+      port: docDbPort
       
     });
 
@@ -119,6 +134,8 @@ export class HospitalsBackendStack extends cdk.Stack {
       dbInstanceIdentifier: `${this.props?.stage}-${this.props?.context}-docdb-instance`
     });
     dbInstance.addDependsOn(dbCluster);
+
+    return dbCluster;
 
   }
 
