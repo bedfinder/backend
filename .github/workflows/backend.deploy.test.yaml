@@ -2,7 +2,7 @@ name: aws deploy backend to test namespace
 on:
   push:
     branches:
-      - feat
+      - feature/*
       - develop*
 env:
   CORE_PATH: core
@@ -44,7 +44,7 @@ jobs:
       - name: Download core build
         uses: actions/download-artifact@v1
         with:
-          name: backend_assets
+          name: backend_build
       - name: install_cdk
         working-directory: ${{env.CDK_PATH}}
         run: npm i
