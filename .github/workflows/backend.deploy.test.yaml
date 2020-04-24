@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: backend_build
-          path: dist
+          path: ${{env.CORE_PATH}}/dist
   deploy:
     name: test
     needs: [build_and_test_core]
