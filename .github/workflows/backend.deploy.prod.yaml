@@ -5,7 +5,7 @@ on:
       - master
 env:
   CORE_PATH: core
-  CDK_PATH: hospitals-backend
+  CDK_PATH: cdk-assets
 jobs:
   build_and_test_core:
     name: build and test - core
@@ -19,6 +19,12 @@ jobs:
       - name: install
         working-directory: ${{env.CORE_PATH}}
         run: npm i
+      - name: install-handler
+        working-directory: ${{env.CORE_PATH}}/functions
+        run: npm i
+      - name: build-handler
+        working-directory: ${{env.CORE_PATH}}/functions
+        run: npm run build
       - name: build
         working-directory: ${{env.CORE_PATH}}
         run: npm run build
