@@ -52,7 +52,7 @@ export class HospitalsBackendStack extends cdk.Stack {
 
     const hospitalsbackendFunktion = new Function(this, `${props?.stage}-${props?.context}-handlerfunction`, {
       runtime: Runtime.NODEJS_12_X,    
-      code: Code.fromAsset('functions'),  
+      code: Code.fromAsset('./functions'),  
       handler: 'lambda.handler',
       vpc: this.bedfinderVpc,
       vpcSubnets: { subnetType: SubnetType.PRIVATE },
