@@ -9,7 +9,7 @@ env:
   CDK_PATH: cdk-assets
 jobs:
   build_and_test_core:
-    name: build - core
+    name: build and test - core
     runs-on: ubuntu-18.04
     steps:
       - name: checkout
@@ -32,7 +32,7 @@ jobs:
           name: backend_build
           path: ${{env.CORE_PATH}}/dist
   deploy:
-    name: test
+    name: deploy to AWS (Test)
     needs: [build_and_test_core]
     runs-on: ubuntu-18.04
     steps:
@@ -53,7 +53,8 @@ jobs:
         run: npm run build
       - uses: youyo/aws-cdk-github-actions@master
         with:
-          cdk_subcommand: deploy Test-HospitalsBackend-Stack
+          cdk_subcommand: deploy
+          cdk_stack: Test-HospitalsBackend-Stack 
           actions_comment: false
           working_dir: ${{env.CDK_PATH}}
           args: --require-approval never
