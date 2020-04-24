@@ -1,14 +1,12 @@
-name: aws core api deployment
+name: aws deploy backend to test namespace
 on:
   push:
     branches:
+      - feat
       - develop*
-      - feature/hospital-backend
-    # paths:
-    #   - core/**
 env:
   CORE_PATH: core
-  CDK_PATH: hospitals-backend
+  CDK_PATH: cdk-assets
 jobs:
   build_and_test_core:
     name: build - core
@@ -28,9 +26,13 @@ jobs:
       - name: test
         working-directory: ${{env.CORE_PATH}}
         run: npm run test
-
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: backend_build
+          path: dist
   deploy:
-    name: deploy
+    name: test
     needs: [build_and_test_core]
     runs-on: ubuntu-18.04
     steps:
@@ -39,15 +41,19 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: "13.12"
-      - name: install
+      - name: Download core build
+        uses: actions/download-artifact@v1
+        with:
+          name: backend_assets
+      - name: install_cdk
         working-directory: ${{env.CDK_PATH}}
         run: npm i
-      - name: build
+      - name: build_cdk
         working-directory: ${{env.CDK_PATH}}
         run: npm run build
       - uses: youyo/aws-cdk-github-actions@master
         with:
-          cdk_subcommand: deploy
+          cdk_subcommand: deploy Test-HospitalsBackend-Stack
           actions_comment: false
           working_dir: ${{env.CDK_PATH}}
           args: --require-approval never

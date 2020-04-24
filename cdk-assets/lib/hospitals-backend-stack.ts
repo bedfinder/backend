@@ -37,11 +37,17 @@ export class HospitalsBackendStack extends cdk.Stack {
       securityGroupName: `${this.props.stage}-LambdaSecurityGroup`
     });
 
+    const bastionSecurityGroup = new SecurityGroup(this, `${this.props.stage}-BastionSecurityGroup`, {
+      vpc: this.bedfinderVpc,
+      securityGroupName: `${this.props.stage}-BastionSecurityGroup`
+    });
+
     const documentDb = this.createDocumentDB(docDbPort,docDBsecurityGroup)
 
-    new BastionHostLinux(this, `${props.stage}-BastionHost`, {
+    const bastionHost = new BastionHostLinux(this, `${props.stage}-BastionHost`, {
       vpc: this.bedfinderVpc,
-      subnetSelection: { subnetType: SubnetType.PRIVATE }
+      subnetSelection: { subnetType: SubnetType.PRIVATE },
+      securityGroup: bastionSecurityGroup
     });
 
     const hospitalsbackendFunktion = new Function(this, `${props?.stage}-${props?.context}-handlerfunction`, {
@@ -60,7 +66,9 @@ export class HospitalsBackendStack extends cdk.Stack {
     this.addDefaultTags(hospitalsbackendFunktion)
     
     docDBsecurityGroup.addIngressRule(lambdasecurityGroup,Port.tcp(docDbPort),"Allow Backend Lambda")
+    docDBsecurityGroup.addIngressRule(bastionSecurityGroup,Port.tcp(docDbPort),"Allow Bastion Host")
 
+    
     const api = new LambdaRestApi(this, `${props?.stage}-${props?.context}-api-gateway`, {
       handler: hospitalsbackendFunktion,
       restApiName: "BackendProxy",
