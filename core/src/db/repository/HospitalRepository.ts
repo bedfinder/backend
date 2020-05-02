@@ -10,7 +10,7 @@ export class HospitalRepository extends MongooseRepository<
     super(hospitalSchema);
   }
 
-  findByPostalCodeAndCity(
+  async findByPostalCodeAndCity(
     postalCode: string,
     city: string,
     limit = 10

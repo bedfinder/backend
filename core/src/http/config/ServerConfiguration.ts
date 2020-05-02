@@ -2,7 +2,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
-import * as express from 'express';
+import express from 'express';
 import { Serverable } from '../../interfaces/http/Serverable';
 
 export class ServerConfiguration {

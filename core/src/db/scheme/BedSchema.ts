@@ -3,6 +3,10 @@ import { Bed } from '../../interfaces/models/Bed';
 
 const schema: Schema = new Schema(
   {
+    hasEcmo: {
+      type: Boolean,
+      default: false,
+    },
     hospital: {
       type: Schema.Types.ObjectId,
       ref: 'Hospital',
@@ -31,6 +35,7 @@ const schema: Schema = new Schema(
       },
       station: {
         type: String,
+        required: true,
       },
     },
     reservedUntil: {

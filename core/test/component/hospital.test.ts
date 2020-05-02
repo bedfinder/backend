@@ -1,5 +1,4 @@
 import { Connection } from '../../src/db/Connection';
-import * as dotenv from 'dotenv';
 import * as http from 'http';
 import axios, { AxiosResponse } from 'axios';
 import { createHospital } from '../helper';
@@ -8,8 +7,6 @@ import { Hospital } from '../../src/interfaces/models/Hospital';
 import { HospitalRepository } from '../../src/db/repository/HospitalRepository';
 import { HospitalService } from '../../src/services/HospitalService';
 import { Server } from '../../src/server';
-
-dotenv.config();
 
 let httpServer: http.Server;
 
@@ -27,7 +24,6 @@ describe('hospitals', () => {
     s.app.set('port', '3000');
     httpServer = http.createServer(s.app);
     httpServer.listen(3000);
-    done();
     done();
   });
 
@@ -87,10 +83,41 @@ describe('hospitals', () => {
 
   describe('existing hospital actions', () => {
     let hospital: string;
+    const hospitalData: Partial<Hospital> = createHospital();
 
     beforeAll(async done => {
-      hospital = (await axios.post('/', createHospital())).data.data._id!;
+      hospital = (await axios.post('/', hospitalData)).data.data._id!;
       created.push(hospital);
+      console.log(hospital);
+      done();
+    });
+
+    afterEach(() => {
+      jest.resetAllMocks();
+      jest.clearAllMocks();
+    });
+
+    it('should update a hospital', async done => {
+      expect.assertions(4);
+      const spy: jest.SpyInstance = jest.spyOn(
+        HospitalService.prototype,
+        'update'
+      );
+      const res: AxiosResponse<BaseResponse<
+        Hospital
+      >> = await axios.patch(`/${hospital}`, {
+        ...hospitalData,
+        name: 'Uniklinik',
+      });
+      console.log(res.data);
+      expect(res.status).toBe(200);
+      expect(HospitalService.prototype.update).toBeCalledTimes(1);
+      expect(HospitalService.prototype.update).toBeCalledWith(hospital, {
+        ...hospitalData,
+        name: 'Uniklinik',
+      });
+      expect((res.data.data as Hospital).name).toBe('Uniklinik');
+      spy.mockReset();
       done();
     });
 
@@ -188,7 +215,7 @@ describe('hospitals', () => {
       done();
     });
 
-    it('should show an hospital by its id', async done => {
+    it('should show a hospital by its id', async done => {
       expect.assertions(2);
       const res: AxiosResponse<BaseResponse<Hospital>> = await axios.get(
         `/${hospital}`
@@ -209,7 +236,7 @@ describe('hospitals', () => {
       done();
     });
 
-    it('should delete an hospital by its id', async done => {
+    it('should delete a hospital by its id', async done => {
       expect.assertions(1);
       const res: AxiosResponse<BaseResponse<Hospital>> = await axios.delete(
         `/${hospital}`

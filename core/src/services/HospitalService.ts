@@ -41,8 +41,24 @@ export class HospitalService {
   }
 
   async create(data: Partial<Hospital>): Promise<Hospital> {
+    console.log('CREATE ME BUTCH');
+    console.log(data);
+
+    // @ts-ignore
+    console.log(await this.repository.create(data));
+
     // @ts-ignore
     return this.repository.create(data);
+  }
+
+  async update(id: string, update: Partial<Hospital>): Promise<Hospital> {
+    const hospital: Hospital | null = await this.repository.update(id, update);
+
+    if (!hospital) {
+      throw new ModelNotFoundError('hospital', id);
+    }
+
+    return hospital;
   }
 
   protected async exists(id: string): Promise<Hospital> {

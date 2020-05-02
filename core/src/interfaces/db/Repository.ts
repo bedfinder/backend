@@ -8,7 +8,7 @@ export interface Repository<S extends Model> {
 
   select(options?: object, projection?: object): Promise<object>;
 
-  find(options: object, projection?: object): Promise<object>;
+  find(options: object, projection?: object): Promise<S[]>;
 
   paginate(
     page?: number,

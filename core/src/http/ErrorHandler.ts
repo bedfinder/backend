@@ -1,4 +1,4 @@
-import express from 'express';
+import * as express from 'express';
 import { logger } from '../utils/logging';
 import { ApiError } from '../error/ApiError';
 import { respond } from './response';

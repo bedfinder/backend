@@ -1,4 +1,4 @@
-import * as mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import { Model } from '../../interfaces/models/Model';
 import { Pagination } from '../../interfaces/Pagination';
 import { Repository } from '../../interfaces/db/Repository';
@@ -22,11 +22,13 @@ export abstract class MongooseRepository<S extends Model & mongoose.Document>
   }
 
   async all(projection?: object): Promise<S[]> {
-    // @ts-ignore
-    return this.model
-      .find({ deletedAt: null }, projection || this.guarded)
-      .lean()
-      .exec();
+    return (
+      this.model
+        // @ts-ignore
+        .find({ deletedAt: null }, projection || this.guarded)
+        .lean()
+        .exec()
+    );
   }
 
   async paginate(
@@ -38,13 +40,14 @@ export abstract class MongooseRepository<S extends Model & mongoose.Document>
     const skip: number = (page - 1) * limit;
 
     return {
-      // @ts-ignore
       total: await this.model
+        // @ts-ignore
         .find({ deletedAt: null, ...conditions }, this.guarded)
         .countDocuments()
         .exec(),
       // @ts-ignore
       data: await this.model
+        // @ts-ignore
         .find({ deletedAt: null, ...conditions }, projection || this.guarded)
         .limit(limit)
         .skip(skip)
@@ -60,26 +63,31 @@ export abstract class MongooseRepository<S extends Model & mongoose.Document>
   }
 
   async select(options?: object, projection?: object): Promise<object> {
-    // @ts-ignore
-    return this.model
-      .find({ deletedAt: null, ...options } || {}, projection || this.guarded)
-      .lean()
-      .exec();
+    return (
+      this.model
+        // @ts-ignore
+        .find({ deletedAt: null, ...options } || {}, projection || this.guarded)
+        .lean()
+        .exec()
+    );
   }
 
-  async find(options: object, projection?: object): Promise<object> {
-    // @ts-ignore
-    return this.model
-      .find({ deletedAt: null, ...options }, projection || this.guarded)
-      .lean()
-      .exec();
+  async find(options: object, projection?: object): Promise<S[]> {
+    return (
+      this.model
+        // @ts-ignore
+        .find({ deletedAt: null, ...options }, projection || this.guarded)
+        .exec()
+    );
   }
 
   async findOne(options: object, projection?: object): Promise<S> {
-    // @ts-ignore
-    return this.model
-      .findOne({ deletedAt: null, ...options }, projection || this.guarded)
-      .exec();
+    return (
+      this.model
+        // @ts-ignore
+        .findOne({ deletedAt: null, ...options }, projection || this.guarded)
+        .exec()
+    );
   }
 
   async findOneDeleted(
@@ -90,10 +98,12 @@ export abstract class MongooseRepository<S extends Model & mongoose.Document>
   }
 
   async update(entityId: string, entity: Partial<S>): Promise<S | null> {
-    // @ts-ignore
-    return this.model
-      .findOneAndUpdate({ _id: entityId }, entity, { new: true })
-      .exec();
+    return (
+      this.model
+        // @ts-ignore
+        .findOneAndUpdate({ _id: entityId }, entity, { new: true })
+        .exec()
+    );
   }
 
   async delete(entityId: string): Promise<void> {
@@ -129,7 +139,7 @@ export abstract class MongooseRepository<S extends Model & mongoose.Document>
     return this.model.count(cond || {}).exec();
   }
 
-  take(limit = 10): Promise<S[]> {
+  async take(limit = 10): Promise<S[]> {
     return this.model
       .find({})
       .limit(limit)
