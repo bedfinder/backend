@@ -1,0 +1,68 @@
+name: aws deploy backend to test namespace
+on:
+  push:
+    branches:
+      - feature/*
+      - develop*
+env:
+  CORE_PATH: core
+  CDK_PATH: cdk-assets
+jobs:
+  build_and_test_core:
+    name: build and test - core
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "13.10.1"
+      - name: install
+        working-directory: ${{env.CORE_PATH}}
+        run: npm i
+      - name: build
+        working-directory: ${{env.CORE_PATH}}
+        run: npm run build
+      - name: lint
+        run: npm run lint
+        working-directory: ${{env.CORE_PATH}}
+      - name: test
+        working-directory: ${{env.CORE_PATH}}
+        run: npm run test
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: backend_build
+          path: ${{env.CORE_PATH}}/dist
+  deploy:
+    name: deploy to AWS (Test)
+    needs: [build_and_test_core]
+    runs-on: ubuntu-18.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "13.12"
+      - name: Download core build
+        uses: actions/download-artifact@v1
+        with:
+          name: backend_build
+      - name: install_cdk
+        working-directory: ${{env.CDK_PATH}}
+        run: npm i
+      - name: build_cdk
+        working-directory: ${{env.CDK_PATH}}
+        run: npm run build
+      - uses: youyo/aws-cdk-github-actions@master
+        with:
+          cdk_subcommand: deploy
+          cdk_stack: Test-HospitalsBackend-Stack 
+          actions_comment: false
+          working_dir: ${{env.CDK_PATH}}
+          args: --require-approval never
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_ACCESS_SECRET }}
+          AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
+          MASTER_USER_PASSWORD: ${{secrets.DOCDB_MASTER_USER_PASSWORD}}
