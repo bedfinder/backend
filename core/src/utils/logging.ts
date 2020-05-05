@@ -1,9 +1,7 @@
 import { createLogger, format, transports } from 'winston';
 
-const service = require('../../package.json').name;
-
 const _logger = createLogger({
-  defaultMeta: { service, timestamp: Date.now() },
+  defaultMeta: { service: 'bedfinder-core-api', timestamp: Date.now() },
   transports: [
     new transports.Console(),
     // TODO: add google cloud storage logger transport

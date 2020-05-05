@@ -23,6 +23,9 @@ jobs:
       - name: build
         working-directory: ${{env.CORE_PATH}}
         run: npm run build
+      - name: lint
+        run: npm run lint
+        working-directory: ${{env.CORE_PATH}}
       - name: test
         working-directory: ${{env.CORE_PATH}}
         run: npm run test
