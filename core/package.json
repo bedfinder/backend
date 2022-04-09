@@ -39,7 +39,7 @@
     "firebase-admin": "^8.10.0",
     "helmet": "^3.22.0",
     "http-status-codes": "^1.4.0",
-    "moment": "^2.25.0",
+    "moment": "^2.29.2",
     "mongoose": "5.9.9",
     "supertest": "^4.0.2",
     "typescript": "^3.8.3",
