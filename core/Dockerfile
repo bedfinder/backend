@@ -1,4 +1,4 @@
-FROM node:13-alpine3.10 as base
+FROM node:22.23.4-alpine as base
 WORKDIR /app
 
 # Add docker env arguments here
